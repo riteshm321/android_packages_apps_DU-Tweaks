@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ContentResolver;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.provider.SearchIndexableResource;
@@ -42,6 +43,7 @@ import java.util.List;
 import com.dirtyunicorns.support.preferences.CustomSeekBarPreference;
 import com.dirtyunicorns.support.preferences.SystemSettingMasterSwitchPreference;
 import com.dirtyunicorns.support.preferences.SystemSettingEditTextPreference;
+import com.dirtyunicorns.support.colorpicker.ColorPickerPreference;
 
 public class QuickSettings extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener, Indexable {
@@ -50,12 +52,14 @@ public class QuickSettings extends SettingsPreferenceFragment
     private static final String QUICK_PULLDOWN = "quick_pulldown";
     private static final String STATUS_BAR_CUSTOM_HEADER = "status_bar_custom_header";
     private static final String FOOTER_TEXT_STRING = "footer_text_string";
+    private static final String QS_PANEL_COLOR = "qs_panel_color";
 
     private ListPreference mQuickPulldown;
     private CustomSeekBarPreference mQsRowsPort;
     private CustomSeekBarPreference mQsRowsLand;
     private CustomSeekBarPreference mQsColumnsPort;
     private CustomSeekBarPreference mQsColumnsLand;
+    private ColorPickerPreference mQsPanelColor;
     private SystemSettingMasterSwitchPreference mCustomHeader;
     private SystemSettingEditTextPreference mFooterString;
 
@@ -114,6 +118,12 @@ public class QuickSettings extends SettingsPreferenceFragment
             Settings.System.putString(getActivity().getContentResolver(),
                     Settings.System.FOOTER_TEXT_STRING, "#DureX");
         }
+
+        mQsPanelColor = (ColorPickerPreference) findPreference(QS_PANEL_COLOR);
+        int QsColor = Settings.System.getIntForUser(getContentResolver(),
+                Settings.System.QS_PANEL_BG_COLOR, Color.WHITE, UserHandle.USER_CURRENT);
+        mQsPanelColor.setNewPreviewColor(QsColor);
+        mQsPanelColor.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -160,6 +170,12 @@ public class QuickSettings extends SettingsPreferenceFragment
                 Settings.System.putString(getActivity().getContentResolver(),
                         Settings.System.FOOTER_TEXT_STRING, "#Durex");
             }
+            return true;
+        } else if (preference == mQsPanelColor) {
+            int bgColor = (Integer) newValue;
+            Settings.System.putIntForUser(getContentResolver(),
+                    Settings.System.QS_PANEL_BG_COLOR, bgColor,
+                    UserHandle.USER_CURRENT);
             return true;
         }
         return false;
