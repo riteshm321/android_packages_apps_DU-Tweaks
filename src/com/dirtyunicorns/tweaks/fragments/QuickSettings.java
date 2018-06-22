@@ -53,12 +53,14 @@ public class QuickSettings extends SettingsPreferenceFragment
     private static final String STATUS_BAR_CUSTOM_HEADER = "status_bar_custom_header";
     private static final String FOOTER_TEXT_STRING = "footer_text_string";
     private static final String QS_PANEL_COLOR = "qs_panel_color";
+    private static final String QS_PANEL_ALPHA = "qs_panel_alpha";
 
     private ListPreference mQuickPulldown;
     private CustomSeekBarPreference mQsRowsPort;
     private CustomSeekBarPreference mQsRowsLand;
     private CustomSeekBarPreference mQsColumnsPort;
     private CustomSeekBarPreference mQsColumnsLand;
+    private CustomSeekBarPreference mQsPanelAlpha;
     private ColorPickerPreference mQsPanelColor;
     private SystemSettingMasterSwitchPreference mCustomHeader;
     private SystemSettingEditTextPreference mFooterString;
@@ -119,6 +121,12 @@ public class QuickSettings extends SettingsPreferenceFragment
                     Settings.System.FOOTER_TEXT_STRING, "#DureX");
         }
 
+        mQsPanelAlpha = (CustomSeekBarPreference) findPreference(QS_PANEL_ALPHA);
+        int qsPanelAlpha = Settings.System.getIntForUser(getContentResolver(),
+                Settings.System.QS_PANEL_BG_ALPHA, 255, UserHandle.USER_CURRENT);
+        mQsPanelAlpha.setValue(qsPanelAlpha);
+        mQsPanelAlpha.setOnPreferenceChangeListener(this);
+
         mQsPanelColor = (ColorPickerPreference) findPreference(QS_PANEL_COLOR);
         int QsColor = Settings.System.getIntForUser(getContentResolver(),
                 Settings.System.QS_PANEL_BG_COLOR, Color.WHITE, UserHandle.USER_CURRENT);
@@ -170,6 +178,12 @@ public class QuickSettings extends SettingsPreferenceFragment
                 Settings.System.putString(getActivity().getContentResolver(),
                         Settings.System.FOOTER_TEXT_STRING, "#Durex");
             }
+            return true;
+        } else if (preference == mQsPanelAlpha) {
+            int bgAlpha = (Integer) newValue;
+            Settings.System.putIntForUser(getContentResolver(),
+                    Settings.System.QS_PANEL_BG_ALPHA, bgAlpha,
+                    UserHandle.USER_CURRENT);
             return true;
         } else if (preference == mQsPanelColor) {
             int bgColor = (Integer) newValue;
