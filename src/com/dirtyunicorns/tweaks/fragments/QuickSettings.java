@@ -22,6 +22,7 @@ import android.content.ContentResolver;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.SearchIndexableResource;
 import android.provider.Settings;
@@ -64,6 +65,9 @@ public class QuickSettings extends SettingsPreferenceFragment
     private ColorPickerPreference mQsPanelColor;
     private SystemSettingMasterSwitchPreference mCustomHeader;
     private SystemSettingEditTextPreference mFooterString;
+    private Handler mHandler;
+    private int mQsPanelAlphaValue;
+    private boolean mChangeQsPanelAlpha = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,7 @@ public class QuickSettings extends SettingsPreferenceFragment
         addPreferencesFromResource(R.xml.quick_settings);
 
         ContentResolver resolver = getActivity().getContentResolver();
+        mHandler = new Handler();
 
         int value = Settings.System.getIntForUser(resolver,
                 Settings.System.QS_ROWS_PORTRAIT, 3, UserHandle.USER_CURRENT);
@@ -124,7 +129,9 @@ public class QuickSettings extends SettingsPreferenceFragment
         mQsPanelAlpha = (CustomSeekBarPreference) findPreference(QS_PANEL_ALPHA);
         int qsPanelAlpha = Settings.System.getIntForUser(getContentResolver(),
                 Settings.System.QS_PANEL_BG_ALPHA, 255, UserHandle.USER_CURRENT);
-        mQsPanelAlpha.setValue(qsPanelAlpha);
+        // Convert QS alpha values 100-255 to corresponding transparency value 100-0
+        int qsTransparencyValue = (int) (100 - (qsPanelAlpha - 100) * 100 / 155);
+        mQsPanelAlpha.setValue(qsTransparencyValue);
         mQsPanelAlpha.setOnPreferenceChangeListener(this);
 
         mQsPanelColor = (ColorPickerPreference) findPreference(QS_PANEL_COLOR);
@@ -180,10 +187,21 @@ public class QuickSettings extends SettingsPreferenceFragment
             }
             return true;
         } else if (preference == mQsPanelAlpha) {
-            int bgAlpha = (Integer) newValue;
+            int qsTransparencyValue = (int) newValue;
+            // Convert QS transparency value on scale of 0-100 to corresponding alpha values 255-100
+            mQsPanelAlphaValue = (int) (255 - (qsTransparencyValue * 155 / 100));
+            if (!mChangeQsPanelAlpha)
+                return true;
+            mChangeQsPanelAlpha = false;
             Settings.System.putIntForUser(getContentResolver(),
-                    Settings.System.QS_PANEL_BG_ALPHA, bgAlpha,
+                    Settings.System.QS_PANEL_BG_ALPHA, mQsPanelAlphaValue,
                     UserHandle.USER_CURRENT);
+            mHandler.postDelayed(() -> {
+                    Settings.System.putIntForUser(getContentResolver(),
+                            Settings.System.QS_PANEL_BG_ALPHA, mQsPanelAlphaValue,
+                            UserHandle.USER_CURRENT);
+                    mChangeQsPanelAlpha = true;
+                }, 1000);
             return true;
         } else if (preference == mQsPanelColor) {
             int bgColor = (Integer) newValue;
