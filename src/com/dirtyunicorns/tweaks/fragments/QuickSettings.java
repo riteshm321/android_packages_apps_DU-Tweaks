@@ -42,18 +42,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dirtyunicorns.support.preferences.CustomSeekBarPreference;
+import com.dirtyunicorns.support.preferences.SystemSettingMasterSwitchPreference;
 
 public class QuickSettings extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
 
 
     private static final String QUICK_PULLDOWN = "quick_pulldown";
+    private static final String STATUS_BAR_CUSTOM_HEADER = "status_bar_custom_header";
 
     private ListPreference mQuickPulldown;
     private CustomSeekBarPreference mQsRowsPort;
     private CustomSeekBarPreference mQsRowsLand;
     private CustomSeekBarPreference mQsColumnsPort;
     private CustomSeekBarPreference mQsColumnsLand;
+    private SystemSettingMasterSwitchPreference mCustomHeader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,12 @@ public class QuickSettings extends SettingsPreferenceFragment
                 Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN, 0, UserHandle.USER_CURRENT);
         mQuickPulldown.setValue(String.valueOf(quickPulldownValue));
         updatePulldownSummary(quickPulldownValue);
+
+        mCustomHeader = (SystemSettingMasterSwitchPreference) findPreference(STATUS_BAR_CUSTOM_HEADER);
+        int qsHeader = Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_CUSTOM_HEADER, 0);
+        mCustomHeader.setChecked(qsHeader != 0);
+        mCustomHeader.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -122,6 +131,11 @@ public class QuickSettings extends SettingsPreferenceFragment
             Settings.System.putIntForUser(resolver, Settings.System.STATUS_BAR_QUICK_QS_PULLDOWN,
                     quickPulldownValue, UserHandle.USER_CURRENT);
             updatePulldownSummary(quickPulldownValue);
+            return true;
+        } else if (preference == mCustomHeader) {
+            boolean header = (Boolean) newValue;
+            Settings.System.putInt(resolver,
+                    Settings.System.STATUS_BAR_CUSTOM_HEADER, header ? 1 : 0);
             return true;
         }
         return false;
