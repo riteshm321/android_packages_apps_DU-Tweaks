@@ -71,6 +71,7 @@
     <string name="buttons_summary">Configure volume rocker options</string>
     <string name="navigation_options_title">Navigation</string>
     <string name="navigation_options_summary">Configure navigation options</string>
+    <string name="nav_bar_layout">Layout</string>
 
     <!-- Multitasking -->
     <string name="active_edge_title">Active Edge</string>
