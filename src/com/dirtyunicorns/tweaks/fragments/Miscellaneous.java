@@ -37,8 +37,6 @@ import com.android.internal.logging.nano.MetricsProto;
 
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
-//import com.android.settings.Utils;
-import com.dirtyunicorns.tweaks.preferences.TelephonyUtils;
 import com.dirtyunicorns.support.preferences.SystemSettingMasterSwitchPreference;
 
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ import java.util.List;
 public class Miscellaneous extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
 
-    private static final String INCALL_VIB_OPTIONS = "incall_vib_options";
     private static final String SCROLLINGCACHE_PREF = "pref_scrollingcache";
     private static final String SCROLLINGCACHE_PERSIST_PROP = "persist.sys.scrollingcache";
     private static final String SCROLLINGCACHE_DEFAULT = "2";
@@ -61,10 +58,6 @@ public class Miscellaneous extends SettingsPreferenceFragment
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.miscellaneous);
         PreferenceScreen prefScreen = getPreferenceScreen();
-        PreferenceCategory incallVibCategory = (PreferenceCategory) findPreference(INCALL_VIB_OPTIONS);
-        if (!TelephonyUtils.isVoiceCapable(getActivity())) {
-            prefScreen.removePreference(incallVibCategory);
-        }
 
         mScrollingCachePref = (ListPreference) findPreference(SCROLLINGCACHE_PREF);
         mScrollingCachePref.setValue(SystemProperties.get(SCROLLINGCACHE_PERSIST_PROP,
