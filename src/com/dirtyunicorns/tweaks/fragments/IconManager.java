@@ -38,17 +38,35 @@ import com.android.settings.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dirtyunicorns.support.preferences.SystemSettingMasterSwitchPreference;
+
 public class IconManager extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
+
+    private static final String STATUS_BAR_LOGO = "status_bar_logo";
+
+    private SystemSettingMasterSwitchPreference mStatusBarLogo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.icon_manager);
+        ContentResolver resolver = getActivity().getContentResolver();
+
+        mStatusBarLogo = (SystemSettingMasterSwitchPreference) findPreference(STATUS_BAR_LOGO);
+        mStatusBarLogo.setChecked((Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_LOGO, 0) == 1));
+        mStatusBarLogo.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (preference == mStatusBarLogo) {
+            boolean value = (Boolean) newValue;
+            Settings.System.putInt(getActivity().getContentResolver(),
+                    Settings.System.STATUS_BAR_LOGO, value ? 1 : 0);
+            return true;
+	}
         return false;
     }
 
