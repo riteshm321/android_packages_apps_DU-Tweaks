@@ -43,6 +43,7 @@ import java.util.List;
 
 import com.dirtyunicorns.support.preferences.CustomSeekBarPreference;
 import com.dirtyunicorns.support.preferences.SystemSettingMasterSwitchPreference;
+import com.dirtyunicorns.support.preferences.SystemSettingEditTextPreference;
 import com.dirtyunicorns.support.colorpicker.ColorPickerPreference;
 
 public class QuickSettings extends SettingsPreferenceFragment
@@ -61,6 +62,7 @@ public class QuickSettings extends SettingsPreferenceFragment
     private CustomSeekBarPreference mQsColumnsLand;
     private SystemSettingMasterSwitchPreference mCustomHeader;
     private ColorPickerPreference mQsPanelColor;
+    private SystemSettingEditTextPreference mFooterString;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,18 @@ public class QuickSettings extends SettingsPreferenceFragment
         String hexColor = String.format("#%08x", (0xffffffff & intColor));
         mQsPanelColor.setSummary(hexColor);
         mQsPanelColor.setNewPreviewColor(intColor);
+
+        mFooterString = (SystemSettingEditTextPreference) findPreference(FOOTER_TEXT_STRING);
+        mFooterString.setOnPreferenceChangeListener(this);
+        String footerString = Settings.System.getString(getContentResolver(),
+                FOOTER_TEXT_STRING);
+        if (footerString != null && footerString != "")
+            mFooterString.setText(footerString);
+        else {
+            mFooterString.setText("#DureX");
+            Settings.System.putString(getActivity().getContentResolver(),
+                    Settings.System.FOOTER_TEXT_STRING, "#DureX");
+        }
     }
 
     @Override
@@ -156,6 +170,17 @@ public class QuickSettings extends SettingsPreferenceFragment
             int intHex = ColorPickerPreference.convertToColorInt(hex);
             Settings.System.putIntForUser(getContentResolver(),
                     Settings.System.QS_PANEL_BG_COLOR, intHex, UserHandle.USER_CURRENT);
+            return true;
+        } else if (preference == mFooterString) {
+            String value = (String) newValue;
+            if (value != "" && value != null)
+                Settings.System.putString(getActivity().getContentResolver(),
+                        Settings.System.FOOTER_TEXT_STRING, value);
+            else {
+                mFooterString.setText("#Durex");
+                Settings.System.putString(getActivity().getContentResolver(),
+                        Settings.System.FOOTER_TEXT_STRING, "#Durex");
+            }
             return true;
         }
         return false;
