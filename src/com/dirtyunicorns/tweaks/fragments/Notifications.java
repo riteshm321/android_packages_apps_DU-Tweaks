@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.provider.Settings;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceScreen;
@@ -44,6 +45,7 @@ import java.util.List;
 
 import com.dirtyunicorns.support.colorpicker.ColorPickerPreference;
 import com.dirtyunicorns.support.preferences.GlobalSettingMasterSwitchPreference;
+import com.dirtyunicorns.support.preferences.CustomSeekBarPreference;
 
 public class Notifications extends SettingsPreferenceFragment
         implements Preference.OnPreferenceChangeListener {
@@ -53,11 +55,13 @@ public class Notifications extends SettingsPreferenceFragment
     private static final String HEADS_UP_NOTIFICATIONS_ENABLED = "heads_up_notifications_enabled";
     private static final String PULSE_AMBIENT_LIGHT_COLOR = "pulse_ambient_light_color";
     private static final String FLASHLIGHT_ON_CALL = "flashlight_on_call";
+    private static final String PULSE_AMBIENT_LIGHT_DURATION = "pulse_ambient_light_duration";
 
     private GlobalSettingMasterSwitchPreference mHeadsUpEnabled;
     private PreferenceCategory mLightsCategory;
     private ColorPickerPreference mEdgeLightColorPreference;
     private ListPreference mFlashlightOnCall;
+    private CustomSeekBarPreference mEdgeLightDurationPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +90,6 @@ public class Notifications extends SettingsPreferenceFragment
         int edgeLightColor = Settings.System.getInt(getContentResolver(),
                 Settings.System.PULSE_AMBIENT_LIGHT_COLOR, 0xFF3980FF);
         mEdgeLightColorPreference.setNewPreviewColor(edgeLightColor);
-        mEdgeLightColorPreference.setAlphaSliderEnabled(false);
         String edgeLightColorHex = String.format("#%08x", (0xFF3980FF & edgeLightColor));
         if (edgeLightColorHex.equals("#ff3980ff")) {
             mEdgeLightColorPreference.setSummary(R.string.default_string);
@@ -94,6 +97,12 @@ public class Notifications extends SettingsPreferenceFragment
             mEdgeLightColorPreference.setSummary(edgeLightColorHex);
         }
         mEdgeLightColorPreference.setOnPreferenceChangeListener(this);
+
+        mEdgeLightDurationPreference = (CustomSeekBarPreference) findPreference(PULSE_AMBIENT_LIGHT_DURATION);
+        int lightDuration = Settings.System.getIntForUser(getContentResolver(),
+                Settings.System.PULSE_AMBIENT_LIGHT_DURATION, 2, UserHandle.USER_CURRENT);
+        mEdgeLightDurationPreference.setValue(lightDuration);
+        mEdgeLightDurationPreference.setOnPreferenceChangeListener(this);
 
         mFlashlightOnCall = (ListPreference) findPreference(FLASHLIGHT_ON_CALL);
         Preference FlashOnCall = findPreference("flashlight_on_call");
@@ -114,6 +123,7 @@ public class Notifications extends SettingsPreferenceFragment
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
+        ContentResolver resolver = getActivity().getContentResolver();
         if (preference == mHeadsUpEnabled) {
             boolean value = (Boolean) newValue;
             Settings.Global.putInt(getContentResolver(),
@@ -137,6 +147,11 @@ public class Notifications extends SettingsPreferenceFragment
                     Settings.System.FLASHLIGHT_ON_CALL, flashlightValue);
             mFlashlightOnCall.setValue(String.valueOf(flashlightValue));
             mFlashlightOnCall.setSummary(mFlashlightOnCall.getEntry());
+            return true;
+        } else if (preference == mEdgeLightDurationPreference) {
+            int value = (Integer) newValue;
+            Settings.System.putIntForUser(getContentResolver(),
+                    Settings.System.PULSE_AMBIENT_LIGHT_DURATION, value, UserHandle.USER_CURRENT);
             return true;
         }
         return false;
