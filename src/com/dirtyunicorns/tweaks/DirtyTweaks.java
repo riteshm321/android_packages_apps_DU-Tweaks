@@ -47,17 +47,17 @@ import com.dirtyunicorns.tweaks.tabs.System;
 
 public class DirtyTweaks extends SettingsPreferenceFragment {
 
-    private MenuItem mMenuItem;
+    private MenuItem menuitem;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        getActivity().setTitle(R.string.dirtytweaks_title);
-
         View view = inflater.inflate(R.layout.dirtytweaks, container, false);
 
         final BottomNavigationViewCustom navigation = view.findViewById(R.id.navigation);
+        navigation.setBackground(new ColorDrawable(
+                getResources().getColor(R.color.BottomBarBackgroundColor)));
 
         final ViewPager viewPager = view.findViewById(R.id.viewpager);
         PagerAdapter mPagerAdapter = new PagerAdapter(getFragmentManager());
@@ -95,13 +95,13 @@ public class DirtyTweaks extends SettingsPreferenceFragment {
 
             @Override
             public void onPageSelected(int position) {
-                if(mMenuItem != null) {
-                    mMenuItem.setChecked(false);
+                if(menuitem != null) {
+                    menuitem.setChecked(false);
                 } else {
                     navigation.getMenu().getItem(0).setChecked(false);
                 }
                 navigation.getMenu().getItem(position).setChecked(true);
-                mMenuItem = navigation.getMenu().getItem(position);
+                menuitem = navigation.getMenu().getItem(position);
             }
 
             @Override

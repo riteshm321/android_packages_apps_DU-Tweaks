@@ -59,14 +59,14 @@ import android.widget.FrameLayout;
  *
  * <pre>
  * layout resource file:
- * &lt;com.google.android.material.bottomnavigation.BottomNavigationMenu
- *     xmlns:app="http://schema.android.com/apk/res/res-auto"
+ * &lt;android.support.design.widget.BottomNavigationView
+ *     xmlns:android="http://schemas.android.com/apk/res/android"
  *     xmlns:design="http://schema.android.com/apk/res/android.support.design"
  *     android:id="@+id/navigation"
  *     android:layout_width="match_parent"
  *     android:layout_height="56dp"
  *     android:layout_gravity="start"
- *     app:menu="@menu/my_navigation_items" /&gt;
+ *     design:menu="@menu/my_navigation_items" /&gt;
  *
  * res/menu/my_navigation_items.xml:
  * &lt;menu xmlns:android="http://schemas.android.com/apk/res/android"&gt;
