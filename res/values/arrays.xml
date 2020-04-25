@@ -1045,6 +1045,7 @@
     <!-- FOD Recognizing fingerprint animations -->
     <string-array name="fod_recog_animation_entries" translatable="false">
         <item>@string/fod_recog_animation_op_mclaren</item>
+        <item>@string/fod_recog_animation_op_energy</item>
         <item>@string/fod_recog_animation_op_ripple</item>
         <item>@string/fod_recog_animation_op_stripe</item>
         <item>@string/fod_recog_animation_pureview_future</item>
@@ -1063,5 +1064,6 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
+        <item>8</item>
     </string-array>
 </resources>
